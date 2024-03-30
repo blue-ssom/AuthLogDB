@@ -1,8 +1,10 @@
 // Token의 유효성 검사 및 사용자 정보 확인
 
 const jwt = require("jsonwebtoken")
+const pool = require("../../database/pg");
 
-const verifyToken = (req, res, next) => {
+
+const verifyToken = async(req, res, next) => {
     // 요청 헤더에서 토큰을 가져옴
     const { token } = req.headers
     console.log("토큰 : ", token);
@@ -13,6 +15,18 @@ const verifyToken = (req, res, next) => {
     }
 
     try {
+        // 0. 토큰이 블랙리스트에 있는지 확인
+        // DB통신
+        const sql = `SELECT COUNT(*) FROM scheduler.token_blacklist WHERE token_value = $1`;
+        const { rows } = await pool.query(sql, [token]); // await를 사용하여 쿼리 결과를 기다림
+        console.log(rows); // 쿼리 결과를 확인하여 문제 해결
+        const isBlacklisted = parseInt(rows[0].count) > 0;
+
+        if (isBlacklisted) {
+            throw new Error('블랙리스트에 있는 토큰입니다.');
+        }
+
+
         // 1. Token이 조작되지 않았는지 + 사용자 정보 확인
         const decodedToken = jwt.verify(token, process.env.TOKEN_SECRET_KEY)
         req.TokenUserIdx = decodedToken.idx; // 토큰에서 사용자 인덱스를 가져와 req 객체에 추가

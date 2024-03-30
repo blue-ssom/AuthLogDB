@@ -41,7 +41,6 @@ router.post("/", checkLogin, async (req, res) => {
         },process.env.TOKEN_SECRET_KEY,{
             "issuer": "stageus",
             "expiresIn": "10h", // 토큰의 만료 시간
-            "iat":new Date().toISOString() // 현재 시간을 ISO 형식으로 얻음, iat = issued at)
         })
         
         result.success = true

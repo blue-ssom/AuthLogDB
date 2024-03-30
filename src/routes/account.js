@@ -181,10 +181,8 @@ router.put('/', verifyToken, async(req, res) => {
 });
 
 // 회원가입
-router.post('/', verifyToken, async(req, res) => {
+router.post('/', async(req, res) => {
     const { id, password, name, phoneNumber, email, address } = req.body
-    const TokenUserIdx = req.TokenUserIdx; // verifyToken 미들웨어에서 저장된 사용자 인덱스
-    console.log("미들웨어에서 가져온 사용자 idx : ", TokenUserIdx);
 
     const result = {
         "success" : false,
@@ -238,6 +236,7 @@ router.post('/', verifyToken, async(req, res) => {
 
 // 회원탈퇴
 router.delete('/', verifyToken, async(req, res) => {
+    const TokenUserIdx = req.TokenUserIdx; // verifyToken 미들웨어에서 저장된 사용자 인덱스
     const result = {
             "success" : false,
             "message" : "",
@@ -252,7 +251,7 @@ router.delete('/', verifyToken, async(req, res) => {
             WHERE idx = $1
         `;
 
-        const data = await pool.query(sql, [sessionUserIdx]);
+        const data = await pool.query(sql, [TokenUserIdx]);
 
         // DB 후처리
         const row = data.rows
@@ -269,6 +268,39 @@ router.delete('/', verifyToken, async(req, res) => {
 });
 
 // 로그아웃
+router.post('/logout', verifyToken, async(req, res) => {
+    // 요청 헤더에서 토큰을 가져옴
+    const { token } = req.headers
+    const result = {
+        "success" : false,
+        "message" : "",
+        "data" : null
+    }
+    try{
+        // DB 통신
+        const sql = `
+            INSERT INTO scheduler.token_blacklist (token_value, expire_at) VALUES ($1, NOW())
+        `;
+        const data = await pool.query(sql, [token]);
+
+        // DB 후처리
+        const row = data.rows
+
+        // 새로운 토큰을 발급하여 클라이언트에게 응답
+        const newToken = jwt.sign({}, process.env.TOKEN_SECRET_KEY, { expiresIn: '0s' }); // 토큰 만료 시간을 0초로 설정
+        res.setHeader('Authorization', newToken);
+
+        // 결과 설정
+        result.success = true;
+        result.message = "로그아웃 성공";
+
+    }catch(e){
+        result.message = e.message;
+    }finally{
+        res.send(result);
+    }
+    
+});
 
 // export 작업
 module.exports = router
