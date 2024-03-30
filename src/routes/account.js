@@ -185,6 +185,59 @@ router.put('/', verifyToken, async(req, res) => {
 });
 
 // 회원가입
+router.post('/', async(req, res) => {
+    const { id, password, name, phoneNumber, email, address } = req.body
+
+    const result = {
+        "success" : false,
+        "message" : "",
+        "data" : null
+    }
+
+    try {
+
+        // 예외처리
+        utils.checkRequiredField(id, "아이디")
+        await utils.checkDuplicateId(id); // 아이디 중복 확인
+
+        utils.checkRequiredField(password, "비밀번호")
+
+        utils.checkName(name, "이름")
+
+        utils.checkPhoneNumber(phoneNumber, "전화번호")
+        await utils.checkDuplicatePhoneNumber(phoneNumber); // 전화번호 중복 확인
+
+        utils.checkEmail(email, "이메일")
+        await utils.checkDuplicateEmail(email); // 이메일 중복 확인
+
+        if(address === null || address ===undefined || address === ""){
+            throw new Error("주소를 입력하세요.")
+        }
+      
+        // DB통신
+        const sql = `
+            INSERT INTO scheduler.user (id, password, name, phonenumber, email, address) 
+            VALUES ($1, $2, $3, $4, $5, $6)
+        `;
+
+        const data = await pool.query(query, [id, password, name, phoneNumber, email, address]);
+
+        // DB 후처리
+        const row = data.rows
+
+        // 결과 설정
+        result.success = true;
+        result.message = "회원가입 성공";
+        result.data = row[0];
+
+    } catch(e) {
+        result.message = e.message;
+    } finally {
+        res.send(result);
+    }
+
+});
+
 // 회원탈퇴
 // 로그아웃
 
