@@ -17,8 +17,8 @@ require("dotenv").config() // dotenv 패키지를 사용하여 환경 변수 로
 const loginRouter = require('./src/routes/index');  // index.js파일 import
 app.use('/login', loginRouter);
 
-// const accountRouter = require('./src/routes/account');  // account.js파일 import
-// app.use('/account', accountRouter);
+const accountRouter = require('./src/routes/account');  // account.js파일 import
+app.use('/account', accountRouter);
 
 // const postRouter = require('./src/routes/post');  // post.js파일 import
 // app.use('/post', postRouter);

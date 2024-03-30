@@ -6,7 +6,6 @@ const pg = require('../../database/pg') // postgreSQL연결
 const utils = require('../utils');
 const checkLogin = require("../middlewares/checkLogin.js")
 
-
 // 로그인 라우트
 router.post("/", async (req, res) => {
     const { id, password } = req.body;
