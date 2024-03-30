@@ -80,17 +80,27 @@ router.get('/find-password', async(req, res) => {
 });
 
 // 특정 user 정보 보기
-router.get('/:idx', verifyToken(req.params.idx), async(req, res) => {
+router.get('/:idx', verifyToken,  async(req, res) => {
+    const requestedUserIdx = parseInt(req.params.idx); // 사용자가 입력한 idx
+    const TokenUserIdx = req.TokenUserIdx; // verifyToken 미들웨어에서 저장된 사용자 인덱스
+    console.log("요청된 사용자 idx : ", requestedUserIdx);
+    console.log("미들웨어에서 가져온 사용자 idx : ", TokenUserIdx);
+
     const result = {
-            "success" : false,
-            "message" : "",
-            "data" : null
+        "success" : false,
+        "message" : "",
+        "data" : null
+    }
+
+    try {
+        // 예외처리
+        if (requestedUserIdx !== TokenUserIdx) {
+          throw new Error("잘못된 접근입니다.")   // 세션이 없는 경우
         }
-   
-   try {
+
         // DB통신
         const sql = `SELECT * FROM scheduler.user WHERE idx = $1`;
-        const data = await pool.query(sql, [sessionUserIdx]);
+        const data = await pool.query(sql, [TokenUserIdx]);
 
         // DB 후처리
         const row = data.rows
@@ -111,6 +121,7 @@ router.get('/:idx', verifyToken(req.params.idx), async(req, res) => {
     }
 
 });
+
 
 
 // 내 회원 정보 수정

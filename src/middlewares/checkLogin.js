@@ -8,12 +8,12 @@ const checkLogin = (req, res, next) => {
     }
 
     try {
-         // 1. Token이 조작되지 않았는지
-         jwt.verify(token, process.env.TOKEN_SECRET_KEY)
+        // 1. Token이 조작되지 않았는지
+        jwt.verify(token, process.env.TOKEN_SECRET_KEY)
 
-         // 2. 이 API를 사용할 권한이 되는지(지금은 필요 없음)
+        // 2. 이 API를 사용할 권한이 되는지(지금은 필요 없음)
 
-         next()
+        next()
 
     } catch(e) {
         console.log(e)

@@ -7,7 +7,7 @@ const utils = require('../utils');
 const checkLogin = require("../middlewares/checkLogin.js")
 
 // 로그인 라우트
-router.post("/", async (req, res) => {
+router.post("/", checkLogin, async (req, res) => {
     const { id, password } = req.body;
     const result = {
         "success" : false,
