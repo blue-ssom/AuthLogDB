@@ -1,6 +1,8 @@
 const router = require("express").Router() // express 안에 있는 Router만 import
+const jwt = require("jsonwebtoken")
 const pool = require("../../database/pg");
 const utils = require('../utils');
+const verifyToken = require("../middlewares/verifyToken")
 
 // 아이디 찾기
 router.get('/find-id', async(req, res) => {
@@ -76,10 +78,45 @@ router.get('/find-password', async(req, res) => {
        res.send(result);
    }
 });
-// 회원가입
+
 // 특정 user 정보 보기
+router.get('/:idx', verifyToken(req.params.idx), async(req, res) => {
+    const result = {
+            "success" : false,
+            "message" : "",
+            "data" : null
+        }
+   
+   try {
+        // DB통신
+        const sql = `SELECT * FROM scheduler.user WHERE idx = $1`;
+        const data = await pool.query(sql, [sessionUserIdx]);
+
+        // DB 후처리
+        const row = data.rows
+
+        if (row.length === 0) {
+            throw new Error("회원정보가 존재하지 않습니다.");
+        }
+        
+        // 결과 설정
+        result.success = true;
+        result.message = "특정 user 정보 조회 성공";
+        result.data = row[0];
+
+    } catch (e) {
+    result.message = e.message;
+    } finally {
+    res.send(result);
+    }
+
+});
+
+
 // 내 회원 정보 수정
+// 회원가입
 // 회원탈퇴
+// 로그아웃
 
 // export 작업
 module.exports = router

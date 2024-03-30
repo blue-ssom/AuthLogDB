@@ -1,0 +1,45 @@
+ // Token의 유효성 검사 및 사용자 정보 확인
+
+const jwt = require("jsonwebtoken")
+
+const verifyToken = (req, res, next) => {
+    // 요청 헤더에서 토큰을 가져옴
+    const { token } = req.headers
+    console.log("특정 user 정보 보기에서 토큰: ", token);
+
+    const result = {
+        "success" : false,
+        "message" : "",
+    }
+
+    try {
+        // 1. Token이 조작되지 않았는지 + 사용자 정보 확인
+        const decodedToken = jwt.verify(token, process.env.TOKEN_SECRET_KEY)
+        const userIdx = decodedToken.idx; // 토큰에서 사용자 인덱스를 가져오기
+        console.log("토큰에서 가져온 userIdx",userIdx)
+
+        // 요청된 사용자의 인덱스를 얻음
+        const requestedUserIdx = parseInt(req.params.idx);
+        console.log("요청된 사용자 idx",requestedUserIdx)
+
+        // 요청된 사용자의 인덱스와 토큰에서 가져온 사용자의 인덱스를 비교
+        if (requestedUserIdx !== userIdx) {
+            res.status(403).json({ message: "잘못된 접근입니다." });
+        }
+
+        next()
+
+    } catch(e) {
+        console.log(e)
+
+        // 1. jwt must be provided" / 2. jwt expired / 3. invalid token
+        if(e.message === "jwt must be provided") result.message = "로그인이 필요합니다."
+        else if(e.message === "jwt expired") result.message = "세션이 만료되었습니다. 다시 로그인해주세요."
+        else if(e.message === "invalid token") result.message = "정상적이지 않은 접근입니다."
+        else result.message = e.message
+
+        res.send(result)
+    }
+}
+
+module.exports = verifyToken
