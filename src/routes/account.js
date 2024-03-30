@@ -138,10 +138,6 @@ router.put('/', verifyToken, async(req, res) => {
     try {
 
         // 예외처리
-        if (requestedUserIdx !== TokenUserIdx) {
-          throw new Error("잘못된 접근입니다.")
-        }
-
         utils.checkRequiredField(id, "아이디")
         await utils.checkDuplicateId(id); // 아이디 중복 확인
 
@@ -185,8 +181,10 @@ router.put('/', verifyToken, async(req, res) => {
 });
 
 // 회원가입
-router.post('/', async(req, res) => {
+router.post('/', verifyToken, async(req, res) => {
     const { id, password, name, phoneNumber, email, address } = req.body
+    const TokenUserIdx = req.TokenUserIdx; // verifyToken 미들웨어에서 저장된 사용자 인덱스
+    console.log("미들웨어에서 가져온 사용자 idx : ", TokenUserIdx);
 
     const result = {
         "success" : false,
@@ -239,6 +237,37 @@ router.post('/', async(req, res) => {
 });
 
 // 회원탈퇴
+router.delete('/', verifyToken, async(req, res) => {
+    const result = {
+            "success" : false,
+            "message" : "",
+            "data" : null
+        }
+   
+    try {
+
+        // DB통신
+        const sql = `
+            DELETE FROM scheduler.user 
+            WHERE idx = $1
+        `;
+
+        const data = await pool.query(sql, [sessionUserIdx]);
+
+        // DB 후처리
+        const row = data.rows
+
+        // 결과 설정
+        result.success = true;
+        result.message = "회원탈퇴 성공";
+        
+    } catch(e) {
+        result.message = e.message;
+    } finally {
+        res.send(result);
+    }
+});
+
 // 로그아웃
 
 // export 작업

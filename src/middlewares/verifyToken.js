@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken")
 const verifyToken = (req, res, next) => {
     // 요청 헤더에서 토큰을 가져옴
     const { token } = req.headers
-    console.log("특정 user 정보 보기에서 토큰: ", token);
+    console.log("토큰 : ", token);
 
     const result = {
         "success" : false,
