@@ -1,3 +1,4 @@
+// 계정과 관련된 API
 const router = require("express").Router() // express 안에 있는 Router만 import
 const jwt = require("jsonwebtoken")
 const pool = require("../../database/pg");
@@ -116,9 +117,9 @@ router.get('/:idx', verifyToken,  async(req, res) => {
         result.data = row[0];
 
     } catch (e) {
-    result.message = e.message;
+        result.message = e.message;
     } finally {
-    res.send(result);
+        res.send(result);
     }
 
 });
@@ -161,7 +162,6 @@ router.put('/', verifyToken, async(req, res) => {
             SET password = $1, name = $2, phonenumber = $3, email = $4, address = $5 
             WHERE idx = $6
         `;
-    
         const data = await pool.query(sql, [password, name, phoneNumber, email, address, sessionUserIdx]);
 
         // DB 후처리
@@ -215,7 +215,6 @@ router.post('/', async(req, res) => {
             INSERT INTO scheduler.user (id, password, name, phonenumber, email, address) 
             VALUES ($1, $2, $3, $4, $5, $6)
         `;
-
         const data = await pool.query(query, [id, password, name, phoneNumber, email, address]);
 
         // DB 후처리
@@ -250,7 +249,6 @@ router.delete('/', verifyToken, async(req, res) => {
             DELETE FROM scheduler.user 
             WHERE idx = $1
         `;
-
         const data = await pool.query(sql, [TokenUserIdx]);
 
         // DB 후처리

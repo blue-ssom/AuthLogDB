@@ -4,10 +4,8 @@ const router = require("express").Router() // express 안에 있는 Router만 im
 const jwt = require("jsonwebtoken")
 const pg = require('../../database/pg') // postgreSQL연결
 const utils = require('../utils');
-const checkLogin = require("../middlewares/checkLogin.js")
 
-// 로그인 라우트
-router.post("/", checkLogin, async (req, res) => {
+router.post("/", async (req, res) => {
     const { id, password } = req.body;
     const result = {
         "success" : false,
@@ -17,10 +15,10 @@ router.post("/", checkLogin, async (req, res) => {
 
     try {
         // 예외처리
-        utils.checkRequiredField(id,"아이디")
-        utils.checkRequiredField(password,"비밀번호")
+        // utils.checkRequiredField(id,"아이디")
+        // utils.checkRequiredField(password,"비밀번호")
 
-        // DB통신
+        // DB통신 
         const sql = `SELECT * FROM scheduler.user WHERE id = $1 AND password = $2`;
         const data = await pg.query(sql, [id, password]);
 
@@ -38,9 +36,10 @@ router.post("/", checkLogin, async (req, res) => {
             idx: user.idx, // 사용자의 인덱스
             id: id, // 사용자의 아이디
             name: user.name // 사용자의 이름
+            // role : -> 토큰에 권한 설정도?
         },process.env.TOKEN_SECRET_KEY,{
             "issuer": "stageus",
-            "expiresIn": "10h", // 토큰의 만료 시간
+            "expiresIn": "30m", // 토큰의 만료 시간
         })
         
         result.success = true

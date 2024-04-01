@@ -1,9 +1,10 @@
 // 알림과 관련된 API
 
-const express = require('express');
-const router = express.Router();
+const router = require("express").Router() // express 안에 있는 Router만 import
+const jwt = require("jsonwebtoken")
 const client = require('../../database/mongodb');
 const { ObjectId } = require('mongodb');
+const verifyToken = require("../middlewares/verifyToken")
 
 // 알림 조회
 router.get('/', verifyToken, async (req, res) => {

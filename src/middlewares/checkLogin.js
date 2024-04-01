@@ -1,11 +1,11 @@
 // Token의 유효성 검사
-
-const pool = require("../../database/pg");
 const jwt = require("jsonwebtoken")
 
 
 const checkLogin = async (req, res, next) => {
     const { token } = req.headers
+    console.log("토큰 : ", token)
+
     const result = {
         "success" : false,
         "message" : "",
@@ -15,17 +15,7 @@ const checkLogin = async (req, res, next) => {
         // 1. Token이 조작되지 않았는지
         jwt.verify(token, process.env.TOKEN_SECRET_KEY)
 
-       // 2. 토큰이 블랙리스트에 있는지 확인
-       // DB통신
-       const sql = `SELECT COUNT(*) FROM scheduler.token_blacklist WHERE token_value = $1`;
-       const rows = await pool.query(sql, [token]); // 배열 형태로 토큰 전달
-       const isBlacklisted = parseInt(rows[0].count) > 0;
-
-       if (isBlacklisted) {
-           throw new Error('블랙리스트에 있는 토큰입니다.');
-       }
-
-       next()
+        next();
 
     } catch(e) {
         console.log(e)
