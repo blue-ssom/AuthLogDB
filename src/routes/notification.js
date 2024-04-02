@@ -4,12 +4,10 @@ const router = require("express").Router() // express 안에 있는 Router만 im
 const jwt = require("jsonwebtoken")
 const client = require('../../database/mongodb');
 const { ObjectId } = require('mongodb');
-const verifyToken = require("../middlewares/verifyToken")
 
 // 알림 조회
-router.get('/', verifyToken, async (req, res) => {
-    const TokenUserIdx = req.TokenUserIdx; // verifyToken 미들웨어에서 저장된 사용자 인덱스
-    console.log("미들웨어에서 가져온 사용자 idx : ", TokenUserIdx);
+router.get('/', async (req, res) => {
+
 
     const result = {
         "success" : false,

@@ -1,16 +1,12 @@
-// 입력값 유효성 검사
-const { body, validationResult } = require('express-validator');
+const { body } = require('express-validator');
 
 // 아이디 필드 검사
-// 비밀번호 필드 검사
-// 이름 필드 검사
-// 전화번호필드 검사
-// 이메일 필드 검사
-// 제목 필드 검사
-// 내용 필드 검사
-
-// 아이디 중복 확인
-// 이메일
-// 전화번호
-
-// 결과 검사
+exports.validateId = [
+    body('id').notEmpty().withMessage('아이디를 입력하세요.'),
+    // 타입 검사 (문자열인지 확인)
+    body('id').isString().withMessage('아이디는 문자열이어야 합니다.'),
+    // 정규식을 사용하여 아이디 형식 검사 (영문자와 숫자만 허용)
+    body('id').matches(/^[a-zA-Z0-9]+$/).withMessage('아이디는 영문자와 숫자로만 이루어져야 합니다.'),
+    // 길이 체크 (4자 이상 10자 이하)
+    body('id').isLength({ min: 4, max: 10 }).withMessage('아이디는 4자 이상 10자 이하여야 합니다.')
+];

@@ -1,4 +1,4 @@
-const pool = require("../database/db");
+const pool = require("../database/pg");
 
 // 아이디와 비밀번호 유효성 검사
 function checkRequiredField(value, fieldName) {

@@ -3,9 +3,12 @@
 const router = require("express").Router() // express 안에 있는 Router만 import
 const jwt = require("jsonwebtoken")
 const pg = require('../../database/pg') // postgreSQL연결
+const { body, validationResult } = require('express-validator');
+const { validateId } = require('../middlewares/validator');
+
 const utils = require('../utils');
 
-router.post("/", async (req, res) => {
+router.post("/", validateId, async (req, res) => {
     const { id, password } = req.body;
     const result = {
         "success" : false,
@@ -15,8 +18,13 @@ router.post("/", async (req, res) => {
 
     try {
         // 예외처리
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            res.status(400).json({ errors: errors.array() });
+        }
+
         // utils.checkRequiredField(id,"아이디")
-        // utils.checkRequiredField(password,"비밀번호")
+        utils.checkRequiredField(password,"비밀번호")
 
         // DB통신 
         const sql = `SELECT * FROM scheduler.user WHERE id = $1 AND password = $2`;

@@ -3,7 +3,7 @@ const router = require("express").Router() // express 안에 있는 Router만 im
 const jwt = require("jsonwebtoken")
 const pool = require("../../database/pg");
 const utils = require('../utils');
-const verifyToken = require("../middlewares/verifyToken")
+
 
 // 아이디 찾기
 router.get('/find-id', async(req, res) => {
@@ -81,11 +81,7 @@ router.get('/find-password', async(req, res) => {
 });
 
 // 특정 user 정보 보기
-router.get('/:idx', verifyToken,  async(req, res) => {
-    const requestedUserIdx = parseInt(req.params.idx); // 사용자가 입력한 idx
-    const TokenUserIdx = req.TokenUserIdx; // verifyToken 미들웨어에서 저장된 사용자 인덱스
-    console.log("요청된 사용자 idx : ", requestedUserIdx);
-    console.log("미들웨어에서 가져온 사용자 idx : ", TokenUserIdx);
+router.get('/:idx',  async(req, res) => {
 
     const result = {
         "success" : false,
@@ -125,11 +121,8 @@ router.get('/:idx', verifyToken,  async(req, res) => {
 });
 
 // 내 회원 정보 수정
-router.put('/', verifyToken, async(req, res) => {
+router.put('/',async(req, res) => {
     const { password, name, phoneNumber, email, address } = req.body
-    const TokenUserIdx = req.TokenUserIdx; // verifyToken 미들웨어에서 저장된 사용자 인덱스
-    console.log("미들웨어에서 가져온 사용자 idx : ", TokenUserIdx);
-
     const result = {
             "success" : false,
             "message" : "",
@@ -234,7 +227,7 @@ router.post('/', async(req, res) => {
 });
 
 // 회원탈퇴
-router.delete('/', verifyToken, async(req, res) => {
+router.delete('/',  async(req, res) => {
     const TokenUserIdx = req.TokenUserIdx; // verifyToken 미들웨어에서 저장된 사용자 인덱스
     const result = {
             "success" : false,
@@ -266,7 +259,7 @@ router.delete('/', verifyToken, async(req, res) => {
 });
 
 // 로그아웃
-router.post('/logout', verifyToken, async(req, res) => {
+router.post('/logout', async(req, res) => {
     // 요청 헤더에서 토큰을 가져옴
     const { token } = req.headers
     const result = {

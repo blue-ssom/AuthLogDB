@@ -4,14 +4,12 @@ const router = require("express").Router() // express 안에 있는 Router만 im
 const jwt = require("jsonwebtoken")
 const pool = require("../../database/pg");
 const utils = require('../utils');
-const verifyToken = require("../middlewares/verifyToken")
+
 
 // *****게시글 관련***** //
 // 게시글 추가 C
-router.post('/', verifyToken, async(req, res) => {
-    const TokenUserIdx = req.TokenUserIdx; // verifyToken 미들웨어에서 저장된 사용자 인덱스
-    console.log("미들웨어에서 가져온 사용자 idx : ", TokenUserIdx);
-    
+router.post('/', async(req, res) => {
+   
     const { title, content, categoryIdx } = req.body
     const result = {
         "success" : false,
@@ -53,9 +51,8 @@ router.post('/', verifyToken, async(req, res) => {
 
 
 // 게시글 조회 R
-router.get('/all', verifyToken, async(req, res) => {
-    const TokenUserIdx = req.TokenUserIdx; // verifyToken 미들웨어에서 저장된 사용자 인덱스
-    console.log("미들웨어에서 가져온 사용자 idx : ", TokenUserIdx);
+router.get('/all', async(req, res) => {
+
 
     const result = {
         "success" : false,
@@ -88,7 +85,7 @@ router.get('/all', verifyToken, async(req, res) => {
 });
 
 // 게시글 수정 U
-router.put('/:postIdx', verifyToken, async(req, res) => {
+router.put('/:postIdx',  async(req, res) => {
     const postIdx = req.params.postIdx; // 게시글 ID
     const TokenUserIdx = req.TokenUserIdx; // verifyToken 미들웨어에서 저장된 사용자 인덱스
     console.log("미들웨어에서 가져온 사용자 idx : ", TokenUserIdx);
@@ -140,11 +137,9 @@ router.put('/:postIdx', verifyToken, async(req, res) => {
 });
 
 // 게시글 삭제 D
-router.delete('/:postIdx', verifyToken, async(req, res) => {
+router.delete('/:postIdx', async(req, res) => {
     const postIdx = req.params.postIdx; // 게시글 ID
-    const TokenUserIdx = req.TokenUserIdx; // verifyToken 미들웨어에서 저장된 사용자 인덱스
-    console.log("미들웨어에서 가져온 사용자 idx : ", TokenUserIdx);
-    
+
     const { title, content } = req.body
     const result = {
         "success" : false,
@@ -185,10 +180,9 @@ router.delete('/:postIdx', verifyToken, async(req, res) => {
 });
 
 // 게시글 좋아요
-router.post('/:postIdx/like', verifyToken, async (req, res) => {
+router.post('/:postIdx/like',  async (req, res) => {
     const postIdx = req.params.postIdx; // 게시글 ID
-    const TokenUserIdx = req.TokenUserIdx; // verifyToken 미들웨어에서 저장된 사용자 인덱스
-    console.log("미들웨어에서 가져온 사용자 idx : ", TokenUserIdx);
+  
     
     const result = {
         "success": false,
@@ -229,10 +223,9 @@ router.post('/:postIdx/like', verifyToken, async (req, res) => {
 });
 
 // 게시글 좋아요 취소
-router.delete('/:postId/like', verifyToken, async (req, res) => {
+router.delete('/:postId/like', async (req, res) => {
     const postIdx = req.params.postIdx; // 게시글 ID
-    const TokenUserIdx = req.TokenUserIdx; // verifyToken 미들웨어에서 저장된 사용자 인덱스
-    console.log("미들웨어에서 가져온 사용자 idx : ", TokenUserIdx);
+   
     
     const result = {
         "success": false,
